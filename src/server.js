@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const serverless = require("serverless-http");
+
 const mongoose = require("mongoose");
 const Refuge = require("./models/refuge");
 
@@ -8,6 +10,7 @@ const MONGO_DB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS
 const express = require("express");
 const Reservation = require('./models/reservation');
 const app = express();
+const router = express.Router();
 
 app.use(express.json())
 
@@ -16,11 +19,11 @@ mongoose.connect(MONGO_DB_URI)
   .then(() => app.listen(port, () => console.log(`Listening on port ${port}`)))
   .catch((err) => console.log(err))
 
-app.get("/", (req, res) => {
+router.get("/", (req, res) => {
   res.send("Hello World!")
 })
 
-app.get("/refuges/:name", (req, res) => {
+router.get("/refuges/:name", (req, res) => {
   const filter = { name: req.params.name }
   Refuge.findOne(filter)
     .then((updatedRefuge) => {
@@ -30,7 +33,7 @@ app.get("/refuges/:name", (req, res) => {
     .catch((err) => res.send(err))
 })
 
-app.post("/refuges", (req, res) => {
+router.post("/refuges", (req, res) => {
   console.log(req.body)
   const refuge = new Refuge(req.body)
 
@@ -39,7 +42,7 @@ app.post("/refuges", (req, res) => {
     .catch((err) => res.send(err))
 })
 
-app.patch("/refuges/:name", async (req, res) => {
+router.patch("/refuges/:name", async (req, res) => {
   console.log(req.body)
   const filter = { name: req.params.name };
   const update = req.body;
@@ -58,8 +61,12 @@ app.patch("/refuges/:name", async (req, res) => {
     .catch((err) => res.send(err))
 })
 
-app.get("/all-refuges", (req, res) => {
+router.get("/all-refuges", (req, res) => {
   Refuge.find()
     .then((allRefuges) => res.send(allRefuges))
     .catch((err) => console.log(err))
 })
+
+app.use("/.netlify/functions/server", router)
+
+module.exports.handler = serverless(app);
