@@ -9,7 +9,8 @@ const refugeSchema = new Schema({
     wantedDates: [String],
     reservation: ReservationSchema,
     reservationUrls: [String],
-    chatId: Number
+    chatId: Number,
+    notify: Boolean
 })
 
 const Refuge = mongoose.model("Refuge", refugeSchema);
