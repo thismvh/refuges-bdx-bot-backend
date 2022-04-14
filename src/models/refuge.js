@@ -4,6 +4,7 @@ const ReservationSchema = require("./reservation").schema
 
 const refugeSchema = new Schema({
     name: { type: String, required: true },
+    prettyName: { type: String, required: true },
     url: { type: String, required: true },
     availableDates: [String],
     wantedDates: [String],
